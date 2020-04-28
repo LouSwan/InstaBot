@@ -7,6 +7,10 @@ A instagram automated bot who repost your tags in comments.
 
 ------------------------------------------------------------
 
+Q- Do I need to install any driver ?
+
+A- Yes ! You just need to install geckodriver ! here ------> https://github.com/mozilla/geckodriver/releases
+
 Q- Wath modules do I need to download ?
 
 A- You just need to download selenium module by doing pip/pip3 install selenium
