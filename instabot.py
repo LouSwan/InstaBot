@@ -140,9 +140,7 @@ class InstaBot():
 username = input("username ------> ")
 password = input("password ------> ")
 
-bot = InstaBot("michel_abassi", "#Phoenix@IG00")
-
-# bot = InstaBot("loup_swann", "#Phoenix@INSTA")
+bot = InstaBot(username, password)
 
 while True:
 	bot.send_del_messages()
