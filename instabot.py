@@ -5,6 +5,7 @@ from selenium import webdriver
 from time import sleep
 import selenium
 import platform
+import getpass
 import random
 import os
 
@@ -61,11 +62,12 @@ class InstaBot():
 		self.driver.execute_script("arguments[0].click();", c_list[index])
 		sleep(5)
 		action_buttons = self.driver.find_elements_by_class_name("aOOlW")
-		# action_buttons[1].click()
-		sleep(1)
+		action_buttons[1].click()
+		sleep(2)
+		action_buttons = self.driver.find_elements_by_class_name("aOOlW")
 		if action_buttons[1].is_displayed():
 			attempt += 1
-			print("Trying to quit the action menu... attempt N° " + str(attempt) + "...", end="\n")
+			print("\nTrying to quit the action menu... attempt N° " + str(attempt) + "...")
 			self.driver.execute_script("arguments[0].click();", action_buttons[2])
 			sleep(2)
 
@@ -108,13 +110,10 @@ class InstaBot():
 				self.driver.execute_script("document.getElementsByClassName('_4l6NB')[" + str(count) + "].style.display = 'block';")
 			comment_count = 0
 			for comment in comment_element:
-				sleep(0.2)
 				comment_count += 1
 				print("Scaning comment N°" + str(comment_count) + "...")
 				comment_msg = comment.find_element_by_xpath(".//span")
 				tag_count = 0
-				print(comment_msg.text)
-				print(len(comment_msg.text))
 				for letter in comment_msg.text:
 					if letter == "#":
 						tag_count += 1
@@ -145,8 +144,8 @@ class InstaBot():
 		self.driver.execute_script("window.scrollTo(0, 10)")
 
 
-username = input("username ------> ")
-password = input("password ------> ")
+username = input("Username ------> ")
+password = getpass.getpass("Password ------> ")
 
 bot = InstaBot(username, password)
 
