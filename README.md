@@ -15,7 +15,7 @@ Q- Wath modules do I need to download ?
 
 A- You can install all the module/modules required by running dependencies.py
 
-Q- Can I modify you code or give it to a friend ?
+Q- Can I modify your code or give it to a friend ?
 
 A- Sure :) ! This code is under MIT license... You can do ANYTING with it !
 
