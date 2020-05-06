@@ -1,13 +1,19 @@
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.common.by import By
-from selenium import webdriver
-from time import sleep
-import selenium
-import platform
-import getpass
-import random
-import os
+
+try:
+	from selenium.webdriver.support.ui import WebDriverWait
+	from selenium.webdriver.support import expected_conditions
+	from selenium.webdriver.common.by import By
+	from selenium import webdriver
+	from time import sleep
+	import selenium
+	import platform
+	import getpass
+	import random
+	import distro
+	import os
+
+except ImportError:
+	print("You need to run the script named 'dependencies.py' before running this one !")
 
 
 def randomize_list(arg_list):
@@ -22,14 +28,23 @@ def randomize_list(arg_list):
 
 class InstaBot():
 	def __init__(self, ident, password):
-		os.system("clear")
+		OS = platform.system()
+		if OS == "Linux":
+			os.system("clear")
+			data = distro.linux_distribution()
+			print("[OS DETECTION] You're using " + data[0].capitalize() + " " + str(data[1]) + "...")
+
+		else:
+			os.system("cls")
+
+	
 		self.ident = ident
 		self.password = password
 		self.driver = webdriver.Firefox()
 		self.driver.get("https://www.instagram.com/")
 		self.driver.maximize_window()
 		sleep(6)
-		print("Log-in with username: " + ident + ", password: " + password + "...")
+		print("Log-in with username: " + ident + ", password: " + "*" * int(len(password) - 1) + "...")
 		username_field = self.driver.find_element_by_xpath("//input[@name=\"username\"]")
 		sleep(random.randint(1, 3))
 		for letter in ident:
@@ -89,6 +104,7 @@ class InstaBot():
 		count = 0
 		comment_section_count = 0
 		for post in all_posts:
+			sleep(0.5)
 			if count == 0:
 				post.click()
 				print("Click")
