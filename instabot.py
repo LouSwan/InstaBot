@@ -18,9 +18,10 @@ def randomize_list(arg_list):
 		new_list.append(arg_list[random_index])
 	return new_list
 
+
 class InstaBot():
 	def __init__(self, ident, password):
-		os.system("c")
+		os.system("clear")
 		self.ident = ident
 		self.password = password
 		self.driver = webdriver.Firefox()
@@ -49,6 +50,7 @@ class InstaBot():
 
 
 	def delete_message(self, c_list, index):
+		attempt = 0
 		comment_scroll_box = self.driver.find_element_by_class_name('XQXOT')
 		for count in range(0, len(c_list) * 10):
 			self.driver.execute_script("arguments[0].scrollBy(0, -100)", comment_scroll_box)
@@ -56,17 +58,23 @@ class InstaBot():
 		if not c_list[index].is_displayed:
 			self.driver.execute_script("arguments[0].scrollBy(0, 100)", comment_scroll_box)
 
-		print("Visible !")
 		self.driver.execute_script("arguments[0].click();", c_list[index])
 		sleep(5)
 		action_buttons = self.driver.find_elements_by_class_name("aOOlW")
-		action_buttons[1].click()
+		# action_buttons[1].click()
 		sleep(1)
+		if action_buttons[1].is_displayed():
+			attempt += 1
+			print("Trying to quit the action menu... attempt N° " + str(attempt) + "...", end="\n")
+			self.driver.execute_script("arguments[0].click();", action_buttons[2])
+			sleep(2)
+
+		sleep(2)
 
 
 	def send_del_messages(self):
-		nbPosts = self.driver.find_element_by_class_name('g47SY').text
-		for count in range(0, int(nbPosts) + 1):
+		nbPosts = WebDriverWait(self.driver, 5).until(expected_conditions.presence_of_element_located((By.XPATH, '//span[@class="g47SY "]')))
+		for count in range(0, int(nbPosts.text) + 1):
 			print("Scroll N°" + str(count))
 			self.driver.execute_script("window.scrollBy(0, 100);")
 			sleep(.025)
@@ -77,7 +85,6 @@ class InstaBot():
 		count = 0
 		comment_section_count = 0
 		for post in all_posts:
-			sleep(0.5)
 			if count == 0:
 				post.click()
 				print("Click")
@@ -87,26 +94,27 @@ class InstaBot():
 					print("Next")
 				except selenium.common.exceptions.NoSuchElementException:
 					break
-			sleep(.5)
 			WebDriverWait(self.driver, 5).until(expected_conditions.presence_of_element_located((By.XPATH, '//div[@class="eo2As "]')))
 			comment_section = self.driver.find_element_by_class_name('eo2As')
 			comment_element = comment_section.find_elements_by_class_name('Mr508')
 			if len(comment_element) < 1:
 				print("There isn't any comment... Skipping...")
 				self.driver.find_element_by_class_name("coreSpriteRightPaginationArrow").click()
+				count += 1
 				continue
 			else:
 				print("There is " + str(len(comment_element)) + " comments in this section!")
 			for count in range(0, len(comment_element)):
 				self.driver.execute_script("document.getElementsByClassName('_4l6NB')[" + str(count) + "].style.display = 'block';")
-			sleep(.5)
 			comment_count = 0
 			for comment in comment_element:
-				sleep(1)
+				sleep(0.2)
 				comment_count += 1
 				print("Scaning comment N°" + str(comment_count) + "...")
 				comment_msg = comment.find_element_by_xpath(".//span")
 				tag_count = 0
+				print(comment_msg.text)
+				print(len(comment_msg.text))
 				for letter in comment_msg.text:
 					if letter == "#":
 						tag_count += 1
@@ -117,7 +125,7 @@ class InstaBot():
 					for tag in random_tag_list:
 						print(tag, end=" ")
 					self.delete_message(comment_action_button, 0)
-					sleep(random.randint(1*60, 3*60))
+					sleep(random.randint(2*60, 3*60))
 					textarea = self.driver.find_element_by_class_name("Ypffh")
 					textarea.click()
 					textarea_visible = self.driver.find_element_by_class_name('Ypffh')
@@ -142,6 +150,7 @@ password = input("password ------> ")
 
 bot = InstaBot(username, password)
 
+# bot = InstaBot("loup_swann", "#Phoenix@INSTA")
+
 while True:
 	bot.send_del_messages()
-	sleep(random.randint(5*60, 10*60))
