@@ -13,7 +13,7 @@ A- Yes ! You just need to install geckodriver ! here ------> https://github.com/
 
 Q- Wath modules do I need to download ?
 
-A- You just need to download selenium module by doing pip/pip3 install selenium
+A- You can install all the module/modules required by running dependencies.py
 
 Q- Can I modify you code or give it to a friend ?
 
