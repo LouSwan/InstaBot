@@ -76,7 +76,8 @@ class InstaBot():
 
 	def send_del_messages(self):
 		self.driver.refresh()
-		nbPosts = WebDriverWait(self.driver, 5).until(expected_conditions.presence_of_element_located((By.XPATH, '//span[@class="g47SY "]')))
+		sleep(3)
+		nbPosts = WebDriverWait(self.driver, 999).until(expected_conditions.presence_of_element_located((By.XPATH, '//span[@class="g47SY "]')))
 		for count in range(0, int(nbPosts.text) + 1):
 			print("Scroll N°" + str(count))
 			self.driver.execute_script("window.scrollBy(0, 100);")
@@ -97,8 +98,7 @@ class InstaBot():
 					print("Next")
 				except selenium.common.exceptions.NoSuchElementException:
 					break
-			WebDriverWait(self.driver, 5).until(expected_conditions.presence_of_element_located((By.XPATH, '//div[@class="eo2As "]')))
-			comment_section = self.driver.find_element_by_class_name('eo2As')
+			comment_section = WebDriverWait(self.driver, 999).until(expected_conditions.presence_of_element_located((By.XPATH, '//div[@class="eo2As "]')))
 			comment_element = comment_section.find_elements_by_class_name('Mr508')
 			if len(comment_element) < 1:
 				print("There isn't any comment... Skipping...")
