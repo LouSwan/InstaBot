@@ -65,7 +65,7 @@ class InstaBot():
 		action_buttons[1].click()
 		sleep(2)
 		action_buttons = self.driver.find_elements_by_class_name("aOOlW")
-		if action_buttons[1].is_displayed():
+		if not len(action_buttons) < 2:
 			attempt += 1
 			print("\nTrying to quit the action menu... attempt N° " + str(attempt) + "...")
 			self.driver.execute_script("arguments[0].click();", action_buttons[2])
@@ -75,6 +75,7 @@ class InstaBot():
 
 
 	def send_del_messages(self):
+		self.driver.refresh()
 		nbPosts = WebDriverWait(self.driver, 5).until(expected_conditions.presence_of_element_located((By.XPATH, '//span[@class="g47SY "]')))
 		for count in range(0, int(nbPosts.text) + 1):
 			print("Scroll N°" + str(count))
@@ -124,7 +125,9 @@ class InstaBot():
 					for tag in random_tag_list:
 						print(tag, end=" ")
 					self.delete_message(comment_action_button, 0)
-					sleep(random.randint(2*60, 3*60))
+					waiting_time = random.randint(2*60, 3*60)
+					print("\nWaiting " + str(waiting_time) + "s before reposting the tags...")
+					sleep(waiting_time)
 					textarea = self.driver.find_element_by_class_name("Ypffh")
 					textarea.click()
 					textarea_visible = self.driver.find_element_by_class_name('Ypffh')
