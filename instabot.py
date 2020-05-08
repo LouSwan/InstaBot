@@ -10,6 +10,7 @@ try:
 	import getpass
 	import random
 	import distro
+	import sys
 	import os
 
 except ImportError:
@@ -18,7 +19,7 @@ except ImportError:
 
 def randomize_list(arg_list):
 	new_list = []
-	for count in range(0, len(arg_list) - 1):
+	for count in range(0, len(arg_list)):
 		random_index = random.randint(0, len(arg_list) - 1)
 		while arg_list[random_index] in new_list:
 			random_index = random.randint(0, len(arg_list) - 1)
@@ -65,16 +66,16 @@ class InstaBot():
 		sleep(5)
 
 
-	def delete_message(self, c_list, index):
+	def delete_message(self, c_list):
 		attempt = 0
 		comment_scroll_box = self.driver.find_element_by_class_name('XQXOT')
 		for count in range(0, len(c_list) * 10):
 			self.driver.execute_script("arguments[0].scrollBy(0, -100)", comment_scroll_box)
 
-		if not c_list[index].is_displayed:
+		if not c_list[0].is_displayed:
 			self.driver.execute_script("arguments[0].scrollBy(0, 100)", comment_scroll_box)
 
-		self.driver.execute_script("arguments[0].click();", c_list[index])
+		self.driver.execute_script("arguments[0].click();", c_list[0])
 		sleep(5)
 		action_buttons = self.driver.find_elements_by_class_name("aOOlW")
 		action_buttons[1].click()
@@ -82,8 +83,8 @@ class InstaBot():
 		action_buttons = self.driver.find_elements_by_class_name("aOOlW")
 		if not len(action_buttons) < 2:
 			attempt += 1
-			print("\nTrying to quit the action menu... attempt N° " + str(attempt) + "...")
-			self.driver.execute_script("arguments[0].click();", action_buttons[2])
+			print("Trying to quit the action menu... attempt N° " + str(attempt) + "...")
+			action_buttons[2].click()
 			sleep(2)
 
 		sleep(2)
@@ -92,7 +93,7 @@ class InstaBot():
 	def send_del_messages(self):
 		self.driver.refresh()
 		sleep(3)
-		nbPosts = WebDriverWait(self.driver, 999).until(expected_conditions.presence_of_element_located((By.XPATH, '//span[@class="g47SY "]')))
+		nbPosts = WebDriverWait(self.driver, 9999).until(expected_conditions.presence_of_element_located((By.XPATH, '//span[@class="g47SY "]')))
 		for count in range(0, int(nbPosts.text) + 1):
 			print("Scroll N°" + str(count))
 			self.driver.execute_script("window.scrollBy(0, 100);")
@@ -104,7 +105,7 @@ class InstaBot():
 		count = 0
 		comment_section_count = 0
 		for post in all_posts:
-			sleep(0.5)
+			sleep(1)
 			if count == 0:
 				post.click()
 				print("Click")
@@ -114,8 +115,8 @@ class InstaBot():
 					print("Next")
 				except selenium.common.exceptions.NoSuchElementException:
 					break
-			comment_section = WebDriverWait(self.driver, 999).until(expected_conditions.presence_of_element_located((By.XPATH, '//div[@class="eo2As "]')))
-			comment_element = comment_section.find_elements_by_class_name('Mr508')
+			comment_section = WebDriverWait(self.driver, 9999).until(expected_conditions.presence_of_element_located((By.XPATH, '//div[@class="eo2As "]')))
+			comment_element = WebDriverWait(self.driver, 9999).until(expected_conditions.presence_of_element_located((By.XPATH, '//ul[@class="Mr508"]')))
 			if len(comment_element) < 1:
 				print("There isn't any comment... Skipping...")
 				self.driver.find_element_by_class_name("coreSpriteRightPaginationArrow").click()
@@ -127,23 +128,32 @@ class InstaBot():
 				self.driver.execute_script("document.getElementsByClassName('_4l6NB')[" + str(count) + "].style.display = 'block';")
 			comment_count = 0
 			for comment in comment_element:
-				comment_count += 1
-				print("Scaning comment N°" + str(comment_count) + "...")
+				sleep(0.1)
 				comment_msg = comment.find_element_by_xpath(".//span")
+				comment_author = comment.find_element_by_xpath('.//a[@class="sqdOP yWX7d     _8A5w5   ZIAjV "]').text
+				comment_count += 1
+				print("Scaning comment N°" + str(comment_count) + " | Author: " + comment_author + "...")
 				tag_count = 0
 				for letter in comment_msg.text:
 					if letter == "#":
 						tag_count += 1
 				if tag_count >= 10:
-					comment_action_button = comment.find_elements_by_class_name("wpO6b")
+					comment_action_button = comment.find_elements_by_xpath(".//button[@class='wpO6b ']")
+					if str(comment_author) != self.ident:
+						print("The author of the comment is not the owner of this account... skipping")
+						continue
 					tags_list = comment_msg.text.split(" ")
 					random_tag_list = randomize_list(tags_list)
+					print("Deleting the comment: " + comment_msg.text)
+					print("New tags order :", end=" ")
 					for tag in random_tag_list:
 						print(tag, end=" ")
-					self.delete_message(comment_action_button, 0)
+					print()
+					self.delete_message(comment_action_button)
 					waiting_time = random.randint(2*60, 3*60)
-					print("\nWaiting " + str(waiting_time) + "s before reposting the tags...")
+					print("Waiting " + str(waiting_time) + "s before reposting the tags...")
 					sleep(waiting_time)
+					print("Writing the comment...")
 					textarea = self.driver.find_element_by_class_name("Ypffh")
 					textarea.click()
 					textarea_visible = self.driver.find_element_by_class_name('Ypffh')
@@ -152,11 +162,19 @@ class InstaBot():
 							textarea_visible.send_keys(tag)
 							textarea_visible.send_keys(" ")
 							sleep(random.random())
-					except selenium.common.exceptions.ElementNotInteractableException:
-						self.driver.save_screenshot('screen.png')
+					except selenium.common.exceptions.ElementNotInteractableException as error:
+						print("[CRITICAL ERROR] SHUT DOWNING THE BOT (comment can't be write)")
+						self.driver.save_screenshot('screen_posting.png')
+						sys.exit()
 					sleep(1)
-					self.driver.find_element_by_xpath('//button[@type="submit"]').click()
-					sleep(2)
+					print("Posting the comment...")
+					try:
+						self.driver.find_element_by_xpath('//button[@type="submit"]').click()
+					except selenium.common.exceptions.ElementNotInteractableException:
+						print("[CRITICAL ERROR] SHUT DOWNING THE BOT (comment can't be posted)")
+						self.driver.save_screenshot('screen_submiting.png')
+						sys.exit()
+					sleep(5)
 			count += 1
 		layout = self.driver.find_element_by_class_name("qJPeX")
 		layout.find_element_by_class_name("wpO6b").click()
