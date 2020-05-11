@@ -241,15 +241,8 @@ sleep_slider_from.place(x=25, y=200)
 sleep_slider_to = Scale(root, from_= 0, to=60,fg="#000000",bd=0,borderwidth=0,sliderlength=8, bg=background, highlightbackground=background,orient=HORIZONTAL)
 sleep_slider_to.place(x=145, y=200)
 
+info = Label(root, text="GUI in build...", bg=background)
+info.place(x=485, y=225)
 
-
-
-# Creating a new Text Widgets in root...
-"""
-credits = Label(root, text="By Louswan")
-
-# Showing it...
-credits.pack()
-"""
 # Main app loop
 root.mainloop()
