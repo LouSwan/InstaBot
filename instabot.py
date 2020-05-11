@@ -2,24 +2,33 @@
 try:
 	from selenium.webdriver.support.ui import WebDriverWait
 	from selenium.webdriver.support import expected_conditions
+	from tkinter import messagebox as tkMessageBox
 	from selenium.webdriver.common.by import By
 	from selenium import webdriver
 	from time import sleep
+	from tkinter import *
 	import selenium
 	import platform
 	import getpass
 	import random
 	import distro
-	import sys
 	import os
 
 except ImportError:
 	print("You need to run the script named 'dependencies.py' before running this one !")
 
+window_size = "600x250"
+
+input_color = "#339966"
+
+background = "#6A9A71"
+
+insta_ver = "1.0"
+
 
 def randomize_list(arg_list):
 	new_list = []
-	for count in range(0, len(arg_list)):
+	for count in range(0, len(arg_list) - 1):
 		random_index = random.randint(0, len(arg_list) - 1)
 		while arg_list[random_index] in new_list:
 			random_index = random.randint(0, len(arg_list) - 1)
@@ -28,7 +37,7 @@ def randomize_list(arg_list):
 
 
 class InstaBot():
-	def __init__(self, ident, password):
+	def __init__(self, ident, password, sleep_from, sleep_to):
 		OS = platform.system()
 		if OS == "Linux":
 			os.system("clear")
@@ -41,6 +50,8 @@ class InstaBot():
 	
 		self.ident = ident
 		self.password = password
+		self.sleep_from = sleep_from
+		self.sleep_to = sleep_to
 		self.driver = webdriver.Firefox()
 		self.driver.get("https://www.instagram.com/")
 		self.driver.maximize_window()
@@ -116,7 +127,7 @@ class InstaBot():
 				except selenium.common.exceptions.NoSuchElementException:
 					break
 			comment_section = WebDriverWait(self.driver, 9999).until(expected_conditions.presence_of_element_located((By.XPATH, '//div[@class="eo2As "]')))
-			comment_element = WebDriverWait(self.driver, 9999).until(expected_conditions.presence_of_element_located((By.XPATH, '//ul[@class="Mr508"]')))
+			comment_element = comment_section.find_elements_by_xpath(".//ul[@class='Mr508']")
 			if len(comment_element) < 1:
 				print("There isn't any comment... Skipping...")
 				self.driver.find_element_by_class_name("coreSpriteRightPaginationArrow").click()
@@ -150,7 +161,7 @@ class InstaBot():
 						print(tag, end=" ")
 					print()
 					self.delete_message(comment_action_button)
-					waiting_time = random.randint(2*60, 3*60)
+					waiting_time = random.randint(self.sleep_from, self.sleep_to)
 					print("Waiting " + str(waiting_time) + "s before reposting the tags...")
 					sleep(waiting_time)
 					print("Writing the comment...")
@@ -181,10 +192,64 @@ class InstaBot():
 		self.driver.execute_script("window.scrollTo(0, 10)")
 
 
-username = input("Username ------> ")
-password = getpass.getpass("Password ------> ")
 
-bot = InstaBot(username, password)
 
-while True:
-	bot.send_del_messages()
+# Instancing the main frame...
+root = Tk()
+
+# Properties of the main frame called 'root'...
+root.geometry(window_size)
+root.config(bg=background)
+root.title("InstaBot {}".format(insta_ver))
+
+
+# Function called when the button 'login_button' is pressed...
+def loginInsta():
+	username = login_username.get()
+	password = login_password.get()
+	sleep_from = sleep_slider_from.get()
+	sleep_to = sleep_slider_to.get()
+	if not len(username) > 2 or not len(password) > 2:
+		tkMessageBox.showerror('InstaBot ERROR.', 'Your username or password is invalid !')
+		return
+
+	tkMessageBox.showinfo('InstaBot INFO.', 'Launching the browser !')
+
+	root.destroy()
+
+	bot = InstaBot(username, password, sleep_from, sleep_to)
+
+	while True:
+		bot.send_del_messages()
+	
+
+# Creating entries widgets and showing them...
+login_username = Entry(root, bg=input_color, highlightbackground="#27870d", borderwidth=0)
+login_username.place(x=220, y=10)
+
+login_password = Entry(root, show="*", highlightbackground="#27870d", bg=input_color, borderwidth=0)
+login_password.place(x=220, y=40)
+
+# the login_button who call loginInsta function...
+login_button = Button(root, text="Log-in", bg=input_color,highlightbackground="#27870d" ,bd=0,command=loginInsta, pady=5)
+login_button.place(x=265, y=70)
+
+# Creating sliders to change values...
+sleep_slider_from = Scale(root, from_= 0, to=60,fg="#000000",bd=0,borderwidth=0,sliderlength=8, bg=background, highlightbackground=background,orient=HORIZONTAL)
+sleep_slider_from.place(x=25, y=200)
+
+sleep_slider_to = Scale(root, from_= 0, to=60,fg="#000000",bd=0,borderwidth=0,sliderlength=8, bg=background, highlightbackground=background,orient=HORIZONTAL)
+sleep_slider_to.place(x=145, y=200)
+
+
+
+
+# Creating a new Text Widgets in root...
+"""
+credits = Label(root, text="By Louswan")
+
+# Showing it...
+credits.pack()
+"""
+# Main app loop
+root.mainloop()
