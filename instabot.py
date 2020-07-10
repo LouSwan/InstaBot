@@ -162,7 +162,6 @@ class InstaBot():
 						print("Next")
 						f.write("[INFO] [" + str(datetime.datetime.now()) + "] " + "Next\n")
 					except selenium.common.exceptions.NoSuchElementException:
-						print("OOF ?")
 						break
 				comment_section = WebDriverWait(self.driver, 9999).until(expected_conditions.presence_of_element_located((By.XPATH, '//div[@class="eo2As "]')))
 				comment_element = comment_section.find_elements_by_xpath(".//ul[@class='Mr508']")
@@ -290,7 +289,6 @@ def insert_logins():
 	data = cursor.fetchall()
 
 	if len(data) < 1:
-		print(data)
 		return
 	else:
 		username = data[0][0]
